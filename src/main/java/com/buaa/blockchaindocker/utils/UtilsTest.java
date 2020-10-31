@@ -44,5 +44,15 @@ public class UtilsTest {
         // } else {
         //     System.out.println("no");
         // }
+
+        //Test removeImage()
+//        String dynamicCode = "yhb123456";
+//        if (DockerJavaUtils.removeImage(dynamicCode)) {
+//            System.out.println("yes");
+//        } else {
+//            System.out.println("no");
+//        }
+
+
     }
 }

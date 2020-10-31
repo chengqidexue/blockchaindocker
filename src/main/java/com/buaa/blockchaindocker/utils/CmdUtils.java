@@ -1,5 +1,6 @@
 package com.buaa.blockchaindocker.utils;
 
+import com.buaa.blockchaindocker.entity.CmdResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +16,12 @@ public class CmdUtils {
      *
      * @param cmd 需要执行的命令
      * @param dir 执行命令的子进程的工作目录, null 表示和当前主进程工作目录相同
-     * @return null 执行出现错误
+     * @return null 执行出现错误  正确执行命令则返回result
      */
-    public static String execCmd(String cmd, File dir){
-        StringBuilder result = new StringBuilder();
+    public static CmdResult execCmd(String cmd, File dir){
+        CmdResult result = new CmdResult();
+        StringBuilder right = new StringBuilder();
+        StringBuilder error = new StringBuilder();
 
         Process process = null;
         BufferedReader bufrIn = null;
@@ -38,17 +41,22 @@ public class CmdUtils {
             // 读取输出
             String line = null;
             while ((line = bufrIn.readLine()) != null) {
-                result.append(line).append('\n');
+                right.append(line).append('\n');
             }
             while ((line = bufrError.readLine()) != null) {
-                result.append(line).append('\n');
+                error.append(line).append('\n');
             }
+
+            result.setRightOutput(right);
+            result.setErrorOutput(error);
+            
             logger.info("运行cmd命令成功:" + cmd);
+            logger.info(String.valueOf(result));
 
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("运行cmd命令错误:" + cmd);
-            result = null;
+            return null;
         }
         finally {
             closeStream(bufrIn);
@@ -59,9 +67,8 @@ public class CmdUtils {
                 process.destroy();
             }
         }
-
         // 返回执行结果
-        return result.toString();
+        return result;
     }
 
     private static void closeStream(Closeable stream) {

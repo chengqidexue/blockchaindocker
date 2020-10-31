@@ -1,5 +1,6 @@
 package com.buaa.blockchaindocker.utils;
 
+import com.buaa.blockchaindocker.entity.CmdResult;
 import com.buaa.blockchaindocker.entity.Project;
 
 import java.io.File;
@@ -13,8 +14,9 @@ public class DockerJavaUtils {
 
     /**
      * 创建镜像
-     * @param project   得到任务后需要创建的额镜像
-     * @return  返回镜像是否创建成功
+     *
+     * @param project 得到任务后需要创建的额镜像
+     * @return 返回镜像是否创建成功
      */
     public static boolean createDockerImage(Project project) {
         //需要执行的Linux命令
@@ -42,18 +44,19 @@ public class DockerJavaUtils {
         cmd = cmd.append("./createImage.sh ").append(dynamicCode).append(" ").append(algorithmFilePath).append(" ")
                 .append(createDockerfileShellPath).append(" ").append(baseImage).append(" ").append(algorithmFileName);
         File dir = new File(shellPath);
-        String result = CmdUtils.execCmd(cmd.toString(), dir);
+        CmdResult result = CmdUtils.execCmd(cmd.toString(), dir);
         System.out.println(result);
         return (result != null);
     }
 
     /**
      * 根据镜像名称创建一个容器并且启动
-     * @param dynamicCode  镜像名称
+     *
+     * @param dynamicCode 镜像名称
      * @return 返回执行的结果
      */
-    public static String startContainer(String dynamicCode){
-        String result = "";
+    public static CmdResult startContainer(String dynamicCode) {
+        CmdResult result = new CmdResult();
         //需要执行的Linux命令
         //#sudo docker run --name {containerName} {imageName}               imageName = {dynamicCode}     containerName = {dynamicCode}Container
         //#sudo docker run --name {containerName} {imageName}:{tag}         If there is no "tag", then tag = "latest".
@@ -64,32 +67,48 @@ public class DockerJavaUtils {
         return result;
     }
 
-   /**
-    * 停止容器 #sudo docker stop {containerName}
-    * @param dynamicCode docker容器
-    */
-   public static boolean stopContainer(String dynamicCode){
-       StringBuilder cmd = new StringBuilder();
-       String containerName = dynamicCode + "Container";
-       File dir = new File(shellPath);
-       cmd.append("./stopContainer.sh ").append(containerName);
-       String result = CmdUtils.execCmd(cmd.toString(), dir);
-       System.out.println(result);
-       return (result != null);
-   }
-
+    /**
+     * 停止容器 #sudo docker stop {containerName}
+     *
+     * @param dynamicCode docker容器
+     */
+    public static boolean stopContainer(String dynamicCode) {
+        StringBuilder cmd = new StringBuilder();
+        String containerName = dynamicCode + "Container";
+        File dir = new File(shellPath);
+        cmd.append("./stopContainer.sh ").append(containerName);
+        CmdResult result = CmdUtils.execCmd(cmd.toString(), dir);
+        System.out.println(result);
+        return (result != null);
+    }
 
     /**
-     * 删除容器 #sudo docker delete {containerName}
-     * @param dynamicCode  根据dynamicCode删除容器，containerName={dynamicCode}Container
-     * @return  返回是否删除成功
+     * 删除容器 #sudo docker rm {containerName}
+     *
+     * @param dynamicCode 根据dynamicCode删除容器，containerName={dynamicCode}Container
+     * @return 返回是否删除成功
      */
-    public static boolean removeContainer(String dynamicCode){
+    public static boolean removeContainer(String dynamicCode) {
         String containerName = dynamicCode + "Container";
         StringBuilder cmd = new StringBuilder();
         File dir = new File(shellPath);
         cmd.append("./deleteContainer.sh ").append(containerName);
-        String result = CmdUtils.execCmd(cmd.toString(), dir);
+        CmdResult result = CmdUtils.execCmd(cmd.toString(), dir);
+        System.out.println(result);
+        return (result != null);
+    }
+
+    /**
+     * 删除镜像 #sudo docker rmi {imageName}
+     *
+     * @param imageName 要删除的镜像名称{dynamicCode}
+     * @return 是否删除成功
+     */
+    public static boolean removeImage(String imageName) {
+        File dir = new File(shellPath);
+        StringBuilder cmd = new StringBuilder();
+        cmd.append("./deleteImage.sh ").append(imageName);
+        CmdResult result = CmdUtils.execCmd(cmd.toString(), dir);
         System.out.println(result);
         return (result != null);
     }
